@@ -1,0 +1,14 @@
+﻿@using MiniShop.Models
+
+<div class="product-grid">
+    @foreach (var product in Products)
+    {
+        <ProductCard Product="product" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<Product> Products { get; set; } = new();
+}
+

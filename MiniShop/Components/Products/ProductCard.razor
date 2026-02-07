@@ -1,0 +1,22 @@
+﻿@using MiniShop.Models
+
+<div class="product-card">
+    <img src="@Product.ImageUrl"
+         alt="@Product.Name"
+         class="product-image" />
+
+    <div class="product-body">
+        <h3>@Product.Name</h3>
+        <p class="description">@Product.Description</p>
+
+        <div class="product-footer">
+            <span class="price">$@Product.Price</span>
+            <a class="btn" href="/products/@Product.Id">View</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Product Product { get; set; } = default!;
+}

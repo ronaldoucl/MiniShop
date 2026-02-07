@@ -1,19 +1,29 @@
 ﻿@page "/products"
 @rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using MiniShop.Data
+@using MiniShop.Models
+@using MiniShop.Components.Products
+@inject AppDbContext Db
 
 <PageTitle>Products</PageTitle>
 
-<h1>Counter</h1>
+<h1 class="page-title">Products</h1>
 
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+@if (products == null)
+{
+    <p>Loading products...</p>
+}
+else
+{
+    <ProductGrid Products="products" />
+}
 
 @code {
-    private int currentCount = 0;
+    private List<Product>? products;
 
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        products = await Db.Products.ToListAsync();
     }
 }

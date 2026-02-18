@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MiniShop.Data;
 using MiniShop.Components;
+using MiniShop.Data;
+using MiniShop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 

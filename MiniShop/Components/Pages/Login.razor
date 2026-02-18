@@ -1,0 +1,90 @@
+﻿@page "/login"
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@using MiniShop.Services
+
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<h3>Login</h3>
+
+<div class="auth-container">
+    <div class="card shadow-lg p-4">
+        <h3 class="text-center mb-4">Log in here</h3>
+<EditForm Model="model" OnValidSubmit="HandleLoginAsync" FormName="loginForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Email</label>
+        <InputText @bind-Value="model.Email" class="form-control" />
+        <ValidationMessage For="@(() => model.Email)" />
+    </div>
+
+    <div class="form-group mt-2">
+        <label>Password</label>
+        <InputText @bind-Value="model.Password" type="password" class="form-control" />
+        <ValidationMessage For="@(() => model.Password)" />
+    </div>
+
+    <button class="btn btn-primary mt-3" disabled="@isLoading">
+        @(isLoading ? "Logging in..." : "Login")
+    </button>
+
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger mt-2">
+            @error
+        </div>
+    }
+</EditForm>
+</div>
+</div>
+
+@code {
+    private bool isLoading;
+    private string? error;
+
+    private LoginModel model = new();
+
+    /// <summary>
+    /// Handles user login process with validation and error control.
+    /// </summary>
+    private async Task HandleLoginAsync()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+
+            var success = await Auth.LoginAsync(model.Email, model.Password);
+
+            if (!success)
+            {
+                error = "Invalid email or password.";
+                return;
+            }
+
+            Nav.NavigateTo("/");
+        }
+        catch
+        {
+            error = "An unexpected error occurred. Please try again.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [MinLength(6)]
+        public string Password { get; set; } = string.Empty;
+    }
+}

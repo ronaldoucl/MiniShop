@@ -1,7 +1,39 @@
 ﻿@page "/"
+@using MiniShop.Services
+@inject AuthService Auth
+@inject NavigationManager Nav
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-5 text-center">
 
-Welcome to your new app.
+    <h1 class="mb-4">Welcome to MiniShop</h1>
+    <p>Your favorite online store built with Blazor.</p>
+
+    @if (Auth.CurrentUser == null)
+    {
+        <div class="mt-4">
+            <button class="btn btn-primary me-3"
+                    @onclick="@(() => Nav.NavigateTo("/login"))">
+                Login
+            </button>
+
+            <button class="btn btn-outline-primary"
+                    @onclick="@(() => Nav.NavigateTo("/register"))">
+                Register
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="mt-4">
+            <h4>Welcome back, @Auth.CurrentUser.Email.Split('@')[0]!</h4>
+
+            <button class="btn btn-success mt-3"
+                    @onclick="@(() => Nav.NavigateTo("/products"))">
+                Start Shopping
+            </button>
+        </div>
+    }
+
+</div>

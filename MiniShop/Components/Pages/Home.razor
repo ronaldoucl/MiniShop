@@ -4,6 +4,9 @@
 @inject NavigationManager Nav
 @rendermode InteractiveServer
 
+@implements IDisposable
+
+
 
 <div class="container mt-5 text-center">
 
@@ -37,3 +40,20 @@
     }
 
 </div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Auth.OnChange += AuthChanged;
+    }
+
+    private void AuthChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Auth.OnChange -= AuthChanged;
+    }
+}

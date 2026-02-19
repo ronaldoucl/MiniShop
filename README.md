@@ -5,8 +5,9 @@ The project demonstrates clean architecture principles, authentication handling,
 
 ---
 
-## 📚 Course Information
+## 📚 Academic Information
 
+**University:** Brigham Young University Idaho  
 **Course:** CSE325 - .NET Software Development  
 
 ### 👥 Participants
@@ -97,7 +98,5 @@ The application follows a service-based architecture using dependency injection 
 - Console logging for debugging
 - Persistent cart stored in database (not in memory)
 
----
 
-## 📂 Project Structure (Simplified)
 

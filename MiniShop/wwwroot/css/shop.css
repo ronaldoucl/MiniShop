@@ -93,3 +93,20 @@
 .card {
     border-radius: 12px;
 }
+
+.button-group {
+    display: flex;
+    gap: 8px;
+}
+
+.view-btn {
+    background: #2563eb;
+}
+
+.cart-btn {
+    background: #16a34a;
+}
+
+.cart-btn:hover {
+    background: #15803d;
+}

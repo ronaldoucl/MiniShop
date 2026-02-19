@@ -3,6 +3,7 @@ using MiniShop.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace MiniShop.Services
 {
@@ -13,17 +14,20 @@ namespace MiniShop.Services
         public User? CurrentUser { get; private set; }
 
         public event Action? OnChange;
+        private readonly ProtectedSessionStorage _sessionStorage;
 
-        public AuthService(AppDbContext context)
+        public AuthService(AppDbContext context, ProtectedSessionStorage sessionStorage)
         {
             _context = context;
+            _sessionStorage = sessionStorage;
         }
 
         private void NotifyStateChanged() => OnChange?.Invoke();
 
-        // ------------------------
-        // User registration with email uniqueness check and password hashing
-        // ------------------------
+        /*
+         * Registers a new user after validating email uniqueness
+         * and stores the password as a hashed value.
+         */
         public async Task<bool> RegisterAsync(string email, string password)
         {
             try
@@ -50,9 +54,10 @@ namespace MiniShop.Services
             }
         }
 
-        // ------------------------
-        // Login hashing and verification
-        // ------------------------
+        /*
+         * Validates user credentials, initializes the session if successful,
+         * and returns true; otherwise returns false.
+         */
         public async Task<bool> LoginAsync(string email, string password)
         {
             try
@@ -69,6 +74,7 @@ namespace MiniShop.Services
                     return false;
 
                 CurrentUser = user;
+                await _sessionStorage.SetAsync("userId", user.Id);
                 NotifyStateChanged();
                 return true;
             }
@@ -78,23 +84,45 @@ namespace MiniShop.Services
             }
         }
 
-        // ------------------------
-        // LOGOUT
-        // ------------------------
-        public void Logout()
+        /*
+         * Clears the current user session, removes it from storage, and notifies state changes.
+         */
+        public async Task LogoutAsync()
         {
             CurrentUser = null;
+            await _sessionStorage.DeleteAsync("userId");
             NotifyStateChanged();
         }
 
-        // ------------------------
-        // Password Handling using SHA256 
-        // ------------------------
+        /*
+         * Hashes the provided password using SHA256 and returns a Base64-encoded string.
+         */
         private string HashPassword(string password)
         {
             using var sha = SHA256.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(bytes);
+        }
+
+        /*
+         * Restores the user session from storage and updates authentication state if found.
+         */
+        public async Task InitializeAsync()
+        {
+            try
+            {
+                var result = await _sessionStorage.GetAsync<int>("userId");
+
+                if (result.Success)
+                {
+                    CurrentUser = await _context.Users.FindAsync(result.Value);
+                    NotifyStateChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[InitializeAsync] Error: {ex.Message}");
+            }
         }
     }
 }

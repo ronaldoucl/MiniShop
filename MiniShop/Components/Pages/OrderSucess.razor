@@ -1,0 +1,19 @@
+﻿@page "/order-success"
+@rendermode InteractiveServer
+
+
+<div class="order-success-container">
+    <h2>Thank you for your purchase! 🎉</h2>
+    <p>Your order has been successfully completed.</p>
+
+    <button @onclick="GoHome">Continue Shopping</button>
+</div>
+
+@code {
+    [Inject] NavigationManager Nav { get; set; } = default!;
+
+    private void GoHome()
+    {
+        Nav.NavigateTo("/");
+    }
+}

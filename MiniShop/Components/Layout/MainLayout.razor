@@ -14,8 +14,23 @@
 </div>
 
 @code {
-    void Logout()
+    /*
+     * Logs out the currently authenticated user.
+     */
+    public async Task Logout()
     {
-        Auth.Logout();
+        await Auth.LogoutAsync();
+    }
+
+    /*
+     * Initializes authentication state on first render and refreshes the UI.
+     */
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Auth.InitializeAsync();
+            StateHasChanged();
+        }
     }
 }

@@ -1,4 +1,8 @@
 ﻿@using MiniShop.Models
+@using MiniShop.Services
+@inject CartService CartService
+@inject AuthService AuthService
+@rendermode InteractiveServer
 
 <div class="product-card">
     <img src="@Product.ImageUrl"
@@ -10,13 +14,45 @@
         <p class="description">@Product.Description</p>
 
         <div class="product-footer">
-            <span class="price">$@Product.Price</span>
-            <a class="btn" href="/products/@Product.Id">View</a>
+            <span class="price">$@Product.Price.ToString("F2")</span>
+
+            <div class="button-group">
+                <a class="btn view-btn" href="/products/@Product.Id">View</a>
+                <button class="btn cart-btn" @onclick="AddToCart">
+                    Add to Cart
+                </button>
+            </div>
         </div>
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="cart-message">
+                @successMessage
+            </div>
+        }
     </div>
 </div>
 
 @code {
     [Parameter]
     public Product Product { get; set; } = default!;
+    private string? successMessage;
+
+    private async Task AddToCart()
+    {
+        if (AuthService.CurrentUser == null)
+        {
+            successMessage = "You must be logged in.";
+            StateHasChanged();
+            return;
+        }
+
+        await CartService.AddToCartAsync(Product);
+
+        successMessage = $"{Product.Name} added to cart ✔";
+        StateHasChanged();
+
+        await Task.Delay(2000);
+        successMessage = null;
+        StateHasChanged();
+    }
 }

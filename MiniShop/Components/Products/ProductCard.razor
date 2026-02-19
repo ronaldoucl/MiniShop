@@ -1,4 +1,8 @@
 ﻿@using MiniShop.Models
+@using MiniShop.Services
+@inject CartService CartService
+@inject AuthService AuthService
+@rendermode InteractiveServer
 
 <div class="product-card">
     <img src="@Product.ImageUrl"
@@ -19,15 +23,36 @@
                 </button>
             </div>
         </div>
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="cart-message">
+                @successMessage
+            </div>
+        }
     </div>
 </div>
 
 @code {
     [Parameter]
     public Product Product { get; set; } = default!;
+    private string? successMessage;
 
-    private void AddToCart()
+    private async Task AddToCart()
     {
-        Console.WriteLine($"Added {Product.Name} to cart");
+        if (AuthService.CurrentUser == null)
+        {
+            successMessage = "You must be logged in.";
+            StateHasChanged();
+            return;
+        }
+
+        await CartService.AddToCartAsync(Product);
+
+        successMessage = $"{Product.Name} added to cart ✔";
+        StateHasChanged();
+
+        await Task.Delay(2000);
+        successMessage = null;
+        StateHasChanged();
     }
 }

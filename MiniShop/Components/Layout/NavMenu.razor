@@ -1,6 +1,8 @@
 ﻿@using MiniShop.Services
 @inject AuthService Auth
 @inject NavigationManager Nav
+@inject CartService CartService
+@rendermode InteractiveServer
 
 @implements IDisposable
 
@@ -15,6 +17,12 @@
 
         <li class="nav-item">
             <NavLink class="nav-link" href="/cart">Cart</NavLink>
+            @if (cartItemCount > 0)
+            {
+                <span class="cart-badge">
+                    @cartItemCount
+                </span>
+            }
         </li>
 
         @if (Auth.CurrentUser == null)
@@ -28,11 +36,11 @@
         }
         else
         {
-            <li class="nav-item d-flex align-items-center text-white me-2">
+            <li class="nav-item d-flex align-items-center text-white me-2 ml-20px">
                 Welcome, @Auth.CurrentUser.Email.Split('@')[0]
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item align-content-center">
                 <button class="btn btn-sm btn-outline-light" @onclick="Logout">
                     Logout
                 </button>
@@ -43,28 +51,60 @@
 
 
 @code {
-    void TestClick()
+    private int cartItemCount;
+
+    /*
+     * Subscribes to auth and cart state changes and loads initial cart data.
+     */
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("CLICKED");
+        Auth.OnChange += OnAnyChange;
+        CartService.OnChange += OnAnyChange;
+
+        await RefreshCart();
     }
-}
 
-
-
-@code {
-    protected override void OnInitialized()
+    /*
+     * Triggers a cart refresh when authentication or cart state changes.
+     */
+    private void OnAnyChange()
     {
-        Auth.OnChange += StateHasChanged;
+        _ = RefreshCart(); 
     }
 
-    private void Logout()
+    /*
+     * Updates the cart item count based on the current user and refreshes the UI.
+     */
+    private async Task RefreshCart()
     {
-        Auth.Logout();
+        if (Auth.CurrentUser != null)
+        {
+            cartItemCount = await CartService.GetCartItemCountAsync();
+        }
+        else
+        {
+            cartItemCount = 0;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /*
+     * Logs out the current user and redirects to the home page.
+     */
+    private async Task Logout()
+    {
+        await Auth.LogoutAsync();
         Nav.NavigateTo("/");
     }
 
+    /*
+     * Unsubscribes from auth and cart events to prevent memory leaks.
+     */
     public void Dispose()
     {
-        Auth.OnChange -= StateHasChanged;
+        Auth.OnChange -= OnAnyChange;
+        CartService.OnChange -= OnAnyChange;
     }
+
 }

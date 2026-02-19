@@ -1,5 +1,5 @@
 ﻿.page-title {
-    margin: 24px 0;
+    margin: 34px 0;
     font-size: 2rem;
 }
 
@@ -7,6 +7,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 24px;
+    margin: 40px;
 }
 
 .product-card {
@@ -25,7 +26,7 @@
 .product-image {
     width: 100%;
     height: 180px;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .product-body {
@@ -109,4 +110,241 @@
 
 .cart-btn:hover {
     background: #15803d;
+}
+
+.cart-btn-detail {
+    background: #16a34a;
+    width: 100%;
+}
+
+.cart-btn-detail:hover {
+    background: #15803d;
+ }
+
+.cart-message {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background-color: #16a34a;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+.cart-title {
+    margin: 30px 0;
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.cart-container {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.cart-items {
+    flex: 2;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+.cart-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.cart-details {
+    flex: 1;
+    margin-left: 20px;
+}
+
+.cart-price {
+    font-weight: 600;
+    color: #16a34a;
+}
+
+.cart-subtotal {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.cart-summary {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    height: fit-content;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.summary-total {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 10px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+    .checkout-btn:hover {
+        background: #1d4ed8;
+    }
+
+.cart-empty {
+    background: #f3f4f6;
+    padding: 20px;
+    border-radius: 10px;
+    width: 70%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.ml-20px {
+    margin-left: 20px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.align-content-center {
+    align-content: center;
+}
+
+.detail-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.detail-container {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    width: 70%;
+    margin: 0 auto;
+}
+
+.detail-image {
+    width: 400px;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.detail-info {
+    flex: 1;
+    text-align: center;
+}
+
+.detail-description {
+    margin: 20px 0;
+    color: #6b7280;
+}
+
+.detail-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.cart-badge {
+    position: absolute;
+    top: 40px;
+    right: 213px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    padding: 1px 4px;
+    font-weight: bold;
+}
+
+.order-success-container {
+    max-width: 500px;
+    margin: 80px auto;
+    padding: 40px;
+    text-align: center;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+    .order-success-container h2 {
+        color: #28a745;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .order-success-container p {
+        color: #555;
+        margin-bottom: 30px;
+        font-size: 16px;
+    }
+
+    .order-success-container button {
+        background-color: #111;
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+        .order-success-container button:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+        }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

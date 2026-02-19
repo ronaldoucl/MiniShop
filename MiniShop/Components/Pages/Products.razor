@@ -8,7 +8,7 @@
 
 <PageTitle>Products</PageTitle>
 
-<h1 class="page-title">Products</h1>
+<h1 class="page-title text-center">Products</h1>
 
 @if (products == null)
 {
@@ -22,6 +22,9 @@ else
 @code {
     private List<Product>? products;
 
+    /*
+     * Loads all products from the database during component initialization.
+     */
     protected override async Task OnInitializedAsync()
     {
         products = await Db.Products.ToListAsync();

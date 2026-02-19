@@ -1,64 +1,137 @@
 ﻿@page "/cart"
-@attribute [StreamRendering]
+@rendermode InteractiveServer
+@using MiniShop.Services
+@using MiniShop.Models
+@inject CartService CartService
+@inject AuthService AuthService
+@inject NavigationManager Nav
+@implements IDisposable
 
-<PageTitle>Cart</PageTitle>
 
-<h1>Weather</h1>
+<h2 class="cart-title">Your Cart</h2>
 
-<p>This component demonstrates showing data.</p>
-
-@if (forecasts == null)
+@if (AuthService.CurrentUser == null)
 {
-    <p><em>Loading...</em></p>
+    <div class="cart-empty">You must be logged in.</div>
+}
+else if (cart == null || !cart.Items.Any())
+{
+    <div class="cart-empty">Your cart is empty.</div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
+    <div class="cart-container">
+
+        <div class="cart-items">
+            @foreach (var item in cart.Items)
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
+                <div class="cart-item">
+
+                    <img src="@item.Product.ImageUrl"
+                         alt="@item.Product.Name"
+                         class="cart-image" />
+
+                    <div class="cart-details">
+                        <h5>@item.Product.Name</h5>
+                        <p class="cart-price">$@item.Price.ToString("F2")</p>
+
+                        <div class="cart-quantity">
+                            <span>Quantity: @item.Quantity</span>
+                        </div>
+                    </div>
+
+                    <div class="cart-subtotal">
+                        $@(item.Price* item.Quantity)
+                    </div>
+
+                </div>
             }
-        </tbody>
-    </table>
+        </div>
+
+        @if (checkoutMessage != null)
+        {
+            <div class="checkout-message">@checkoutMessage</div>
+        }
+        <div class="cart-summary">
+            <h4>Order Summary</h4>
+            <div class="summary-row">
+                <span>Total:</span>
+                <span class="summary-total">$@cart.Total.ToString("F2")</span>
+            </div>
+
+            <button class="checkout-btn" @onclick="Checkout">
+                Proceed to Checkout
+            </button>
+
+        </div>
+
+    </div>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private Order? cart;
+    private string? checkoutMessage;
 
+    /*
+     * Subscribes to authentication changes and loads the cart
+     * if a user is already authenticated.
+     */
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
+        AuthService.OnChange += AuthChanged;
 
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        if (AuthService.CurrentUser != null)
         {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+            cart = await CartService.GetCartAsync();
+        }
     }
 
-    private class WeatherForecast
+    /*
+     * Updates the cart when authentication state changes
+     * and refreshes the UI accordingly.
+     */
+    private async void AuthChanged()
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        if (AuthService.CurrentUser != null)
+        {
+            cart = await CartService.GetCartAsync();
+        }
+        else
+        {
+            cart = null;
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
+
+    /*
+     * Unsubscribes from authentication state changes to prevent memory leaks.
+     */
+    public void Dispose()
+    {
+        AuthService.OnChange -= AuthChanged;
+    }
+
+    /*
+     * Finalizes the current cart order and redirects to the success page
+     * if the checkout process completes successfully.
+     */
+    private async Task Checkout()
+    {
+        if (cart == null || !cart.Items.Any())
+            return;
+
+        var success = await CartService.CheckoutAsync();
+
+        if (success)
+        {
+            Nav.NavigateTo("/order-success");
+        }
+        else
+        {
+            checkoutMessage = "Checkout failed.";
+            StateHasChanged();
+        }
+    }
+
 }

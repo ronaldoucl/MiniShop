@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using MiniShop.Components;
 using MiniShop.Data;
@@ -15,12 +16,15 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
     SeedData.Initialize(context);
 }
 

@@ -1,0 +1,83 @@
+﻿@page "/products/{Id:int}"
+@rendermode InteractiveServer
+
+@using MiniShop.Models
+@using MiniShop.Data
+@using MiniShop.Services
+@inject AppDbContext DbContext
+@inject CartService CartService
+@inject AuthService AuthService
+
+<h2 class="detail-title">Product Details</h2>
+
+@if (product == null)
+{
+    <p>Loading product...</p>
+}
+else
+{
+    <div class="detail-container">
+
+        <img src="@product.ImageUrl"
+             alt="@product.Name"
+             class="detail-image" />
+
+        <div class="detail-info">
+            <h3>@product.Name</h3>
+            <p class="detail-description">@product.Description</p>
+
+            <h4 class="detail-price">$@product.Price.ToString("F2")</h4>
+
+            <button class="btn cart-btn-detail" @onclick="AddToCart">
+                Add to Cart
+            </button>
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="cart-message">
+                    @successMessage
+                </div>
+            }
+        </div>
+
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Product? product;
+    private string? successMessage;
+
+    /*
+     * Retrieves the selected product by its Id during component initialization.
+     */
+    protected override async Task OnInitializedAsync()
+    {
+        product = await DbContext.Products.FindAsync(Id);
+    }
+
+    /*
+     * Adds the current product to the cart if the user is authenticated
+     * and displays a temporary success message.
+     */
+    private async Task AddToCart()
+    {
+        if (AuthService.CurrentUser == null)
+        {
+            successMessage = "You must be logged in.";
+            StateHasChanged();
+            return;
+        }
+
+        await CartService.AddToCartAsync(product!);
+
+        successMessage = $"{product!.Name} added to cart ✔";
+        StateHasChanged();
+
+        await Task.Delay(2000);
+        successMessage = null;
+        StateHasChanged();
+    }
+}
